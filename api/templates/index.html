@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Party Information</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Party Information</h2>
+        <form id="partyForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="city">City:</label>
+                <input type="text" class="form-control" id="city" required>
+            </div>
+            <div class="form-group">
+                <label for="partyType">Party Type:</label>
+                <input type="text" class="form-control" id="partyType" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <textarea class="form-control" id="address" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="landLine">Landline Number:</label>
+                <input type="text" class="form-control" id="landLine" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile Number:</label>
+                <input type="text" class="form-control" id="mobile" required>
+            </div>
+            <div class="form-group">
+                <label for="gst">GST Number:</label>
+                <input type="text" class="form-control" id="gst" required>
+            </div>
+            <div class="form-group">
+                <label for="contactPerson">Contact Person:</label>
+                <input type="text" class="form-control" id="contactPerson" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+        <br>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>City</th>
+                    <th>Party Type</th>
+                    <th>Address</th>
+                    <th>Email</th>
+                    <th>Landline Number</th>
+                    <th>Mobile Number</th>
+                    <th>GST Number</th>
+                    <th>Contact Person</th>
+                </tr>
+            </thead>
+            <tbody id="partyTableBody">
+                <!-- The data from the API will be displayed here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const form = document.getElementById('partyForm');
+        const tableBody = document.getElementById('partyTableBody');
+
+        function displayPartyData() {
+            fetch('/', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear existing table rows
+                tableBody.innerHTML = '';
+
+                // Populate table with updated data
+                data.forEach(party => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${party.city}</td>
+                        <td>${party.party_type}</td>
+                        <td>${party.address}</td>
+                        <td>${party.email}</td>
+                        <td>${party.land_line_number}</td>
+                        <td>${party.mobile_number}</td>
+                        <td>${party.gst_no}</td>
+                        <td>${party.contact_person}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch('/party-master', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Refresh the table with the updated data
+                displayPartyData();
+
+                form.reset();
+            })
+            .catch(error => console.error('Error saving data:', error));
+        });
+
+        // Fetch party data on page load
+        displayPartyData();
+    </script>
+</body>
+</html>
