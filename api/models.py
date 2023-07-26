@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Party(models.Model):
+    id = models.AutoField(primary_key=True)
     city = models.CharField(max_length=100)
     party_type = models.CharField(max_length=100)
     address = models.TextField()

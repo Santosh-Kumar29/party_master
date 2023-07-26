@@ -5,70 +5,69 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Party Information</h2>
-        <form id="partyForm">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="city">City:</label>
-                <input type="text" class="form-control" id="city" required>
-            </div>
-            <div class="form-group">
-                <label for="partyType">Party Type:</label>
-                <input type="text" class="form-control" id="partyType" required>
-            </div>
-            <div class="form-group">
-                <label for="address">Address:</label>
-                <textarea class="form-control" id="address" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" class="form-control" id="email" required>
-            </div>
-            <div class="form-group">
-                <label for="landLine">Landline Number:</label>
-                <input type="text" class="form-control" id="landLine" required>
-            </div>
-            <div class="form-group">
-                <label for="mobile">Mobile Number:</label>
-                <input type="text" class="form-control" id="mobile" required>
-            </div>
-            <div class="form-group">
-                <label for="gst">GST Number:</label>
-                <input type="text" class="form-control" id="gst" required>
-            </div>
-            <div class="form-group">
-                <label for="contactPerson">Contact Person:</label>
-                <input type="text" class="form-control" id="contactPerson" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Save</button>
-        </form>
-        <br>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>City</th>
-                    <th>Party Type</th>
-                    <th>Address</th>
-                    <th>Email</th>
-                    <th>Landline Number</th>
-                    <th>Mobile Number</th>
-                    <th>GST Number</th>
-                    <th>Contact Person</th>
-                </tr>
-            </thead>
-            <tbody id="partyTableBody">
-                <!-- The data from the API will be displayed here -->
-            </tbody>
-        </table>
-    </div>
+{% csrf_token %}
+<div class="container">
+    <h2>Party Information</h2>
+    <form id="partyForm">
+        <div class="form-group">
+            <label for="city">City:</label>
+            <input type="text" class="form-control" id="city" required>
+        </div>
+        <div class="form-group">
+            <label for="partyType">Party Type:</label>
+            <input type="text" class="form-control" id="partyType" required>
+        </div>
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <textarea class="form-control" id="address" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="landLine">Landline Number:</label>
+            <input type="text" class="form-control" id="landLine" required>
+        </div>
+        <div class="form-group">
+            <label for="mobile">Mobile Number:</label>
+            <input type="text" class="form-control" id="mobile" required>
+        </div>
+        <div class="form-group">
+            <label for="gst">GST Number:</label>
+            <input type="text" class="form-control" id="gst" required>
+        </div>
+        <div class="form-group">
+            <label for="contactPerson">Contact Person:</label>
+            <input type="text" class="form-control" id="contactPerson" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>City</th>
+            <th>Party Type</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th>Landline Number</th>
+            <th>Mobile Number</th>
+            <th>GST Number</th>
+            <th>Contact Person</th>
+        </tr>
+        </thead>
+        <tbody id="partyTableBody">
+        </tbody>
+    </table>
+</div>
 
-    <script>
+<script>
         const form = document.getElementById('partyForm');
         const tableBody = document.getElementById('partyTableBody');
 
         function displayPartyData() {
-            fetch('/', {
+            fetch('/party-master', {
                 method: 'GET'
             })
             .then(response => response.json())
@@ -95,25 +94,44 @@
             .catch(error => console.error('Error fetching data:', error));
         }
 
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(form);
-            fetch('/party-master', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Refresh the table with the updated data
-                displayPartyData();
+         form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = {
+            city: document.getElementById('city').value,
+            party_type: document.getElementById('partyType').value,
+            address: document.getElementById('address').value,
+            email: document.getElementById('email').value,
+            land_line_number: document.getElementById('landLine').value,
+            mobile_number: document.getElementById('mobile').value,
+            gst_no: document.getElementById('gst').value,
+            contact_person: document.getElementById('contactPerson').value
+        };
 
-                form.reset();
-            })
-            .catch(error => console.error('Error saving data:', error));
-        });
+        fetch('/party-master', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (response.status === 201) {
+                return response.json();
+            } else {
+                throw new Error('Data save failed');
+            }
+        })
+        .then(data => {
+            // Refresh the table with the updated data
+            displayPartyData();
 
-        // Fetch party data on page load
-        displayPartyData();
-    </script>
+            form.reset();
+        })
+        .catch(error => console.error('Error saving data:', error));
+    });
+
+    displayPartyData();
+
+</script>
 </body>
 </html>
